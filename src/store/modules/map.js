@@ -34,6 +34,9 @@ export default {
     async REMOVE_MARKER ({commit}, id) {
       await backendApiService.removeMarker(id)
       commit('removeMarker', id)
+    },
+    SET_LOCALE (_, locale) {
+      backendApiService.setLocale(locale)
     }
   },
   mutations: {

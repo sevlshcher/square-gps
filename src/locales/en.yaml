@@ -1,0 +1,9 @@
+about: About
+map: Map
+en: English
+ru: Русский
+markers: Markers
+lngLat: "lng: {lng} {'|'} lat: {lat}"
+latitude: 'Latitude: '
+longitude: 'Longitude: '
+zoom: 'Zoom:'

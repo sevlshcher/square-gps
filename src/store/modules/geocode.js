@@ -18,7 +18,6 @@ export default {
     },
     async CONVERT_COORDS ({commit}, { id, coords, ignoreError = false }) {
       const data = await geocodeApiService.convertCoords(coords)
-      console.log({id, coords})
       !data.error
         ? commit('setAddress', { id, data })
         : !ignoreError && commit('setApiError', data.error)

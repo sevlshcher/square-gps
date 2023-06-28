@@ -1,4 +1,5 @@
 import mapboxgl from 'mapbox-gl'
+import { getUniqId, shortenCoords } from '@/common/helpers/helper'
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmxvd25jdWJlIiwiYSI6ImNsamNsNmxqYjI4ZGgzZHF6OTE3cjc0MXEifQ.b1bXIRHOHex9qvmoH092jA  '
 
@@ -42,9 +43,7 @@ export class MapboxGlService {
 
     this.$map.on('load', () => {
       this.$map.on("move", () => {
-        mapOptions.center = Object.fromEntries(Object.entries(this.$map.getCenter()).map(([key, coords]) => {
-          return [key, coords.toFixed(4)]
-        }))
+        mapOptions.center = shortenCoords(this.$map.getCenter())
       })
 
       this.$map.on("zoom", () => {
@@ -53,7 +52,7 @@ export class MapboxGlService {
 
       this.$map.on('click', async (e) => {
         if (!isMarkerMode.value) { return }
-        const id = Math.random().toString().slice(2, 15)
+        const id = getUniqId()
         const coords = e.lngLat
         await store.dispatch('CONVERT_COORDS', { id, coords })
         this.addMarker(id, coords, isMarkerMode, store)
@@ -71,6 +70,15 @@ export class MapboxGlService {
       .onClick(this.setActiveMarker.bind(this, id, markers))
       .setPopup(this.createPopup(address, coords))
       .addTo(this.$map)
+  }
+
+  createPopup (address, coords) {
+    const { lng, lat } = shortenCoords(coords)
+    const popupHtml = `
+      <span><em>${lat}</em>, <em>${lng}</em></span>
+      <h3>${address}</h3>
+    `
+    return new mapboxgl.Popup({ className: 'mb-popup', offset: 25 }).setHTML(popupHtml)
   }
 
   addMarkers (store) {
@@ -92,16 +100,6 @@ export class MapboxGlService {
       store.dispatch('ADD_MARKER', { id, coords, el: marker })
       isMarkerMode.value = false
     }
-  }
-
-  createPopup (address, coords) {
-    const { lng, lat } = coords
-    const popupHtml = `
-      <h3>${address}</h3>
-      <span><strong>Longitude:</strong> <em>${lng}</em></span>
-      <span><strong>Latitude:</strong> <em>${lat}</em></span>
-    `
-    return new mapboxgl.Popup({ className: 'mb-popup', offset: 25 }).setHTML(popupHtml)
   }
 
   setActiveMarker (id, markers) {

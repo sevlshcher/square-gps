@@ -1,46 +1,50 @@
 <template>
-  <v-container fluid class="fill-height">
+  <v-container fluid class="fill-height map-wrapper">
     <v-row class="fill-height">
-      <v-col cols="3">
-        <v-card class="fill-height" title="Markers">
+      <v-col cols="3" class="fill-height">
+        <v-card :title="t('markers')" class="fill-height">
           <template v-slot:prepend>
             <v-icon icon="mdi-map-marker" color="red"></v-icon>
           </template>
           <v-divider></v-divider>
-          <v-list>
-            <v-list-item
-              v-for="marker in markersList"
-              :active="marker.active"
-              :key="marker.id"
-              :subtitle="`lng: ${marker.coords.lng.toFixed(4)} | lat: ${marker.coords.lat.toFixed(4)}`"
-              :title="marker.title"
-              :value="marker"
-              lines="two"
-              @click="setActiveMarker(marker.id)"
-            >
-              <template #append>
-                <v-btn
-                  color="red-lighten-3"
-                  icon="mdi-delete"
-                  size="small"
-                  variant="text"
-                  @click.stop="removeMarker(marker)"
-                />
-              </template>
-            </v-list-item>
-          </v-list>
+          <v-virtual-scroll :items="markersList" height="92%">
+            <template v-slot:default="{ item }">
+              <v-list-item
+                :active="item.active"
+                :title="item.title"
+                :value="item"
+                class="pa-3"
+                lines="two"
+                @click="setActiveMarker(item.id)"
+              >
+                <template #subtitle>
+                  <span>{{ t('latitude') + item.coords.lat}}</span><br>
+                  <span>{{ t('longitude') + item.coords.lng}}</span>
+                </template>
+                <template #append>
+                  <v-btn
+                    color="red-lighten-3"
+                    icon="mdi-delete"
+                    size="small"
+                    variant="text"
+                    @click.stop="removeMarker(item)"
+                  />
+                </template>
+              </v-list-item>
+            </template>
+          </v-virtual-scroll>
         </v-card>
       </v-col>
-      <v-col cols="9">
-        <v-card :loading="isLoading" class="fill-height map-wrapper">
+      <v-col cols="9" class="fill-height">
+        <v-card :loading="isLoading" class="fill-height">
           <div ref="mapContainer" class="map-container" />
           <div class="map-footer">
             <div class="map-footer__info">
-              <v-sheet><strong>Longitude:</strong> {{ mapOptions.center.lng }}</v-sheet>
+              <v-sheet><strong>{{ t('latitude') }}</strong>{{ mapOptions.center.lat }}</v-sheet>
               <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>Latitude:</strong> {{ mapOptions.center.lat }}</v-sheet>
+              <v-sheet><strong>{{ t('longitude') }}</strong>{{ mapOptions.center.lng }}</v-sheet>
               <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>Zoom:</strong> {{ mapOptions.zoom }}</v-sheet>
+              <v-sheet><strong>{{ t('zoom') }}</strong> {{ mapOptions.zoom }}</v-sheet>
             </div>
             <v-btn
               v-show="!isMarkerMode"
@@ -74,14 +78,17 @@
 import { ref, onMounted, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
+import { shortenCoords } from '@/common/helpers/helper';
+import { MapboxGlService } from '@/common/services/mapbox-gl.service'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { MapboxGlService } from '@/common/services/mapbox-gl.service';
 
 export default {
   setup() {
     const router = useRouter()
     const route = useRoute()
     const store = useStore()
+    const { t } = useI18n({ useScope: 'global' })
     const mapboxGL = reactive(new MapboxGlService())
     const isLoading = computed(() => !mapboxGL.isLoaded)
     const mapContainer = ref(null)
@@ -97,6 +104,7 @@ export default {
     const isMarkerMode = ref(false)
 
     watch(activeMarker, (newVal, oldVal) => {
+      console.log({newVal, oldVal})
       if (newVal !== oldVal) { setMarkerQuery() }
     })
 
@@ -110,6 +118,7 @@ export default {
         store
       })
       map.value = mapboxGL.map
+      setMarkerQuery()
     })
 
     function getMarkersList (markers) {
@@ -117,15 +126,12 @@ export default {
         const title = store.getters.getAddress(marker.id)
         return {
           ...marker,
+          coords: shortenCoords(marker.coords),
           active: marker.id === activeMarker.value,
           title
         }
       })
     }
-
-    // function getMarker(id) {
-    //   return store.getters.getMarkerById(id)
-    // }
 
     function setActiveMarker (id) {
       mapboxGL.goToMarker(id, store)
@@ -145,6 +151,7 @@ export default {
     }
 
     return {
+      t,
       isLoading,
       mapContainer,
       mapOptions,
@@ -160,6 +167,10 @@ export default {
 </script>
 
 <style lang="scss">
+.map-wrapper {
+  max-height: calc(100vh - 64px);
+}
+
 .map-container {
   width: 100%;
   height: 100%;
@@ -177,10 +188,12 @@ export default {
     padding: 1.2em;
     border-radius: 4px;
 
-    h3 {
+    span {
+      display: block;
       padding-bottom: .7em;
       margin-bottom: .7em;
       border-bottom: 1px solid lightgray;
+      text-align: center;
     }
 
     button {

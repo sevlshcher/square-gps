@@ -23,6 +23,10 @@ class BackendApiService {
     const updatedData = existingData.filter(item => item.id !== markerId)
     localStorage.setItem('markers', JSON.stringify(updatedData))
   }
+
+  setLocale (locale) {
+    localStorage.setItem('locale', JSON.stringify(locale))
+  }
 }
 
 export const backendApiService = new BackendApiService()

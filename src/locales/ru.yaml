@@ -1,0 +1,9 @@
+about: О проекте
+map: Карта
+en: English
+ru: Русский
+markers: Отметки
+lngLat: "д.: {lng} {'|'} ш.: {lat}"
+latitude: 'Широта: '
+longitude: 'Долгота: '
+zoom: 'Масштаб:'
