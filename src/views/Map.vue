@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid class="fill-height map-wrapper">
+  <v-container fluid class="fill-height map-page">
     <v-row class="fill-height">
       <v-col cols="3" class="fill-height">
-        <v-card :title="t('markers')" class="fill-height">
+        <v-card :title="t('map.markers')" class="fill-height">
           <template v-slot:prepend>
             <v-icon icon="mdi-map-marker" color="red"></v-icon>
           </template>
@@ -18,8 +18,8 @@
                 @click="setActiveMarker(item.id)"
               >
                 <template #subtitle>
-                  <span>{{ t('latitude') + item.coords.lat}}</span><br>
-                  <span>{{ t('longitude') + item.coords.lng}}</span>
+                  <span>{{ t('map.latitude') + item.coords.lat}}</span><br>
+                  <span>{{ t('map.longitude') + item.coords.lng}}</span>
                 </template>
                 <template #append>
                   <v-btn
@@ -40,11 +40,11 @@
           <div ref="mapContainer" class="map-container" />
           <div class="map-footer">
             <div class="map-footer__info">
-              <v-sheet><strong>{{ t('latitude') }}</strong>{{ mapOptions.center.lat }}</v-sheet>
+              <v-sheet><strong>{{ t('map.latitude') }}</strong>{{ mapOptions.center.lat }}</v-sheet>
               <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>{{ t('longitude') }}</strong>{{ mapOptions.center.lng }}</v-sheet>
+              <v-sheet><strong>{{ t('map.longitude') }}</strong>{{ mapOptions.center.lng }}</v-sheet>
               <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>{{ t('zoom') }}</strong> {{ mapOptions.zoom }}</v-sheet>
+              <v-sheet><strong>{{ t('map.zoom') }}</strong> {{ mapOptions.zoom }}</v-sheet>
             </div>
             <v-btn
               v-show="!isMarkerMode"
@@ -167,7 +167,7 @@ export default {
 </script>
 
 <style lang="scss">
-.map-wrapper {
+.map-page {
   max-height: calc(100vh - 64px);
 }
 

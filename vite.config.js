@@ -18,7 +18,8 @@ export default defineConfig({
       autoImport: true
     }),
     i18n({
-      include: resolve(dirname(fileURLToPath(import.meta.url)), './src/locales/***')
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './src/locales/***'),
+      strictMessage: false
     }),
     unfonts({
       fontsource: {

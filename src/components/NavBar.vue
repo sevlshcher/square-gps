@@ -32,7 +32,7 @@
           :value="lng"
           @click="switchLocale(lng)"
         >
-          <v-list-item-title>{{ t(lng) }}</v-list-item-title>
+          <v-list-item-title>{{ t(`navbar.${lng}`) }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -50,8 +50,8 @@ const store = useStore()
 const { t, availableLocales, locale } = useI18n({ useScope: 'global' })
 const links = computed(() => {
   return [
-    { path: '/about', title: t('about') },
-    { path: '/', title: t('map') }
+    { path: '/about', title: t('navbar.about') },
+    { path: '/', title: t('navbar.map') }
   ].map(link => ({...link, active: link.path === route.path}))
 })
 

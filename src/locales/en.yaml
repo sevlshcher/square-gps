@@ -1,9 +1,33 @@
-about: About
-map: Map
-en: English
-ru: Русский
-markers: Markers
-lngLat: "lng: {lng} {'|'} lat: {lat}"
-latitude: 'Latitude: '
-longitude: 'Longitude: '
-zoom: 'Zoom:'
+navbar:
+  about: About
+  map: Map
+  en: English
+  ru: Русский
+map_page:
+  markers: Markers
+  latitude: 'Latitude: '
+  longitude: 'Longitude: '
+  zoom: 'Zoom:'
+about_page:
+  header: SquareGPS test case
+  description: 'You need to use Vuejs, Vuex, VueRouter, Vuetify to write an application. The application header should contain a menu of 2 items: About and Map. The main part of the application should display the contents of the sections.'
+  about_section:
+    title: <strong>"About" section</strong>
+    content: The section should contain the text of the task case, laid out in a similar manner.
+  map_section:
+    title: <strong>"Map" section</strong>
+    content:
+      1: There should be a map and a list (see example)
+      2: 'When you click on add button, map must switch to add marker mode: a marker must appear in the place of clicking, and in the list - a record with the address of the point.<br>You can use any free geocoding API to search for address, for example: <a href="https://geocode.maps.co/">geocode.maps.co</a><br>In case the address is not found, you should display an error and not add marker to the list.'
+      3: When you click on the marker, the record in the list should be highlighted
+      4: When you click on a record in the list the map should be centered on the marker
+      5: Markers should be stored locally and not disappear after reloading the page
+      6: The id of the selected marker must be displayed in the address bar
+      7: Local data storage must be organized as a service emulating a backend. (A Backend class is needed, which pseudo-asynchronously saves data to localStorage)
+  optional_section:
+    title: <strong>Optional</strong>
+    content:
+      1: Consider displaying on mobile devices
+      2: Provide localization
+      3: Using jest, write one unit test for any component
+  reminder_section: '<strong>Remember</strong>: the test task is intended to show the ability to write good modular code, as well as the ability to use the above technologies, and not only. This code is something to be proud of.'
