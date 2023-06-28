@@ -33,6 +33,7 @@ export default defineConfig({
       }
     })
   ],
+  base: '/square-gps/',
   define: { 'process.env': {} },
   resolve: {
     alias: {
