@@ -27,6 +27,10 @@ class BackendApiService {
   setLocale (locale) {
     localStorage.setItem('locale', JSON.stringify(locale))
   }
+
+  toggleInfo (value) {
+    localStorage.setItem('info_panel', JSON.stringify(value))
+  }
 }
 
 export const backendApiService = new BackendApiService()

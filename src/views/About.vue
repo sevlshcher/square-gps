@@ -1,8 +1,9 @@
 <template>
-  <v-container fluid class="fill-height about-page">
-    <v-row class="justify-center">
-      <v-col cols="9">
+  <v-container fluid class="fill-height about-page" :class="{'pa-0': xs}">
+    <v-row no-gutters class="justify-center">
+      <v-col :cols="xs ? 12 : 9">
       <v-card
+        :elevation="xs ? 0 : 1"
         :title="t('about_page.header')"
         :subtitle="t('about_page.description')"
       >
@@ -31,8 +32,11 @@
 <script setup>
 import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 
 const { t } = useI18n({ useScope: 'global' })
+const { xs } = useDisplay()
+
 const tasks = reactive([
   { id: 'about_section.title', isSection: true },
   { id: 'about_section.content' },

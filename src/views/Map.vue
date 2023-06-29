@@ -1,51 +1,29 @@
 <template>
-  <v-container fluid class="fill-height map-page">
-    <v-row class="fill-height">
-      <v-col cols="3" class="fill-height">
-        <v-card :title="t('map_page.markers')" class="fill-height">
-          <template v-slot:prepend>
-            <v-icon icon="mdi-map-marker" color="red"></v-icon>
-          </template>
-          <v-divider></v-divider>
-          <v-virtual-scroll :items="markersList" height="92%">
-            <template v-slot:default="{ item }">
-              <v-list-item
-                :active="item.active"
-                :title="item.title"
-                :value="item"
-                class="pa-3"
-                lines="two"
-                @click="setActiveMarker(item.id)"
-              >
-                <template #subtitle>
-                  <span>{{ t('map_page.latitude') + item.coords.lat}}</span><br>
-                  <span>{{ t('map_page.longitude') + item.coords.lng}}</span>
-                </template>
-                <template #append>
-                  <v-btn
-                    color="red-lighten-3"
-                    icon="mdi-delete"
-                    size="small"
-                    variant="text"
-                    @click.stop="removeMarker(item)"
-                  />
-                </template>
-              </v-list-item>
-            </template>
-          </v-virtual-scroll>
-        </v-card>
-      </v-col>
-      <v-col cols="9" class="fill-height">
-        <v-card :loading="isLoading" class="fill-height">
+  <v-container fluid class="fill-height pa-0 map-page">
+    <Sidebar @goToMarker="goToMarker" />
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" class="fill-height">
+        <v-card :loading="isLoading" class="fill-height rounded-0">
           <div ref="mapContainer" class="map-container" />
-          <div class="map-footer">
-            <div class="map-footer__info">
-              <v-sheet><strong>{{ t('map_page.latitude') }}</strong>{{ mapOptions.center.lat }}</v-sheet>
-              <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>{{ t('map_page.longitude') }}</strong>{{ mapOptions.center.lng }}</v-sheet>
-              <v-divider class="ms-3" thickness="2" vertical></v-divider>
-              <v-sheet><strong>{{ t('map_page.zoom') }}</strong> {{ mapOptions.zoom }}</v-sheet>
-            </div>
+          <div v-if="isInfoVisible" class="map-footer map-footer__info elevation-1">
+            <v-table density="compact">
+              <thead>
+              <tr>
+                <th v-for="(_, key) in mapOptions" :key="key">
+                  {{ t(`map_page.${key}`)}}
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td v-for="(value, key) in mapOptions" :key="key">
+                  {{ value }}
+                </td>
+              </tr>
+              </tbody>
+            </v-table>
+          </div>
+          <div class="map-footer map-footer__btn" :class="{'info-hidden': !isInfoVisible}">
             <v-btn
               v-show="!isMarkerMode"
               icon="mdi-plus"
@@ -79,32 +57,29 @@ import { ref, onMounted, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { shortenCoords } from '@/common/helpers/helper';
 import { MapboxGlService } from '@/common/services/mapbox-gl.service'
+import Sidebar from '@/components/Sidebar.vue'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 export default {
+  components: { Sidebar },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const store = useStore()
     const { t } = useI18n({ useScope: 'global' })
+
     const mapboxGL = reactive(new MapboxGlService())
     const isLoading = computed(() => !mapboxGL.isLoaded)
     const mapContainer = ref(null)
     const map = ref(null)
-    const mapOptions = reactive({
-      center: { lng: 41.6399, lat: 41.6434 },
-      zoom: 7,
-    })
+    const mapOptions = reactive({ lat: 41.6434, lng: 41.6399, zoom: 7 })
     const apiError = computed(() => store.getters.getApiError)
-    const markers = computed(() => store.getters.getMarkers)
-    const markersList = computed(() => getMarkersList(markers))
-    const activeMarker = computed(() => mapboxGL.activeMarker)
+    const activeMarker = computed(() => store.getters.getActiveMarker)
+    const isInfoVisible = computed(() => store.getters.isInfoVisible)
     const isMarkerMode = ref(false)
 
     watch(activeMarker, (newVal, oldVal) => {
-      console.log({newVal, oldVal})
       if (newVal !== oldVal) { setMarkerQuery() }
     })
 
@@ -121,24 +96,8 @@ export default {
       setMarkerQuery()
     })
 
-    function getMarkersList (markers) {
-      return markers.value.map(marker => {
-        const title = store.getters.getAddress(marker.id)
-        return {
-          ...marker,
-          coords: shortenCoords(marker.coords),
-          active: marker.id === activeMarker.value,
-          title
-        }
-      })
-    }
-
-    function setActiveMarker (id) {
+    function goToMarker (id) {
       mapboxGL.goToMarker(id, store)
-    }
-
-    function removeMarker (marker) {
-      mapboxGL.removeMarker(marker, store)
     }
 
     function setMarkerQuery () {
@@ -156,10 +115,9 @@ export default {
       mapContainer,
       mapOptions,
       apiError,
-      markersList,
       isMarkerMode,
-      setActiveMarker,
-      removeMarker,
+      isInfoVisible,
+      goToMarker,
       closeApiError
     }
   }
@@ -168,19 +126,12 @@ export default {
 
 <style lang="scss">
 .map-page {
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 48px);
 }
 
 .map-container {
   width: 100%;
   height: 100%;
-}
-
-.mb-marker {
-  --marker-color: dodgerblue;
-  path {
-    fill: var(--marker-color);
-  }
 }
 
 .mb-popup {
@@ -204,31 +155,32 @@ export default {
 
 .map-footer {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 1em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1em;
-  background-color: transparent;
-  z-index: 1;
+  opacity: .9;
+  z-index: 2;
 }
 
 .map-footer__info {
-  display: flex;
-  justify-content: space-between;
-  padding: .75em 1em;
-  color: #fff;
-  background-color: rgba(66, 66, 66, .8);
+  left: 1em;
+  bottom: 1em;
+  text-align: center;
   border-radius: 4px;
 
-  .v-sheet {
-    color: inherit;
-    background-color: transparent;
+  @media only screen and (max-width: 480px) {
+    border-radius: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 1;
+  }
+}
 
-    &:not(:first-of-type) {
-      margin-left: 12px;
+.map-footer__btn {
+  right: 1em;
+  bottom: 2em;
+
+  @media only screen and (max-width: 480px) {
+    &:not(.info-hidden) {
+      bottom: 6em;
     }
   }
 }

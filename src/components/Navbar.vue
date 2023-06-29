@@ -1,10 +1,6 @@
 <template>
-  <v-app-bar app>
-    <v-toolbar-title class="flex-0-1 pr-16">
-      <div class="app-logo">
-        <span class="app-logo__text">gps</span>
-      </div>
-    </v-toolbar-title>
+  <v-app-bar app :density="mobile ? 'compact' : 'default'" :elevation="1">
+    <v-img :src="logoUrl"  max-width="50" class="mx-6" />
     <v-btn
       v-for="link in links"
       :active="link.active"
@@ -15,7 +11,7 @@
       variant="plain"
     />
     <v-spacer></v-spacer>
-    <v-menu open-on-hover>
+    <v-menu>
       <template v-slot:activator="{ props }">
         <v-btn
           icon="mdi-translate"
@@ -44,10 +40,14 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
+import logoUrl from '@/assets/logo.jpg'
 
 const route = useRoute()
 const store = useStore()
 const { t, availableLocales, locale } = useI18n({ useScope: 'global' })
+const { mobile } = useDisplay()
+
 const links = computed(() => {
   return [
     { path: '/about', title: t('navbar.about') },
@@ -62,26 +62,6 @@ function switchLocale (lng) {
 </script>
 
 <style lang="scss">
-.app-logo {
-  position: relative;
-  width: max-content;
-  margin-left: 1em;
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -40%;
-    width: 1.4em;
-    aspect-ratio: 1;
-    background: linear-gradient(to bottom, #696969 15%, transparent 30%, transparent 100%) no-repeat 100% 0;
-    background-size: 2px 100%;
-    border: 2px solid #696969;
-    border-right: 0;
-    border-radius: 2px;
-  }
-}
-
 .navbar-link {
   &.v-btn--active {
     opacity: 1;

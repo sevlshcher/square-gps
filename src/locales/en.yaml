@@ -5,9 +5,10 @@ navbar:
   ru: Русский
 map_page:
   markers: Markers
-  latitude: 'Latitude: '
-  longitude: 'Longitude: '
-  zoom: 'Zoom:'
+  lat: 'Latitude'
+  lng: 'Longitude'
+  zoom: 'Zoom'
+  info_panel: 'Info panel'
 about_page:
   header: SquareGPS test case
   description: 'You need to use Vuejs, Vuex, VueRouter, Vuetify to write an application. The application header should contain a menu of 2 items: About and Map. The main part of the application should display the contents of the sections.'

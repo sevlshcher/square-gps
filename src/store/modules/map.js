@@ -2,13 +2,17 @@ import { backendApiService } from '@/common/api/backend.api-service'
 
 export default {
   state: {
-    markers: []
+    markers: [],
+    activeMarker: null,
+    isInfoVisible: true
   },
   getters: {
     getMarkers: state => state.markers,
     getMarkerById: state => id => {
       return state.markers.find(marker => marker.id === id)
-    }
+    },
+    getActiveMarker: state => state.activeMarker,
+    isInfoVisible: state => state.isInfoVisible
   },
   actions: {
     async FETCH_MARKERS ({dispatch, commit, rootGetters}) {
@@ -31,12 +35,19 @@ export default {
     UPDATE_MARKER ({commit}, marker) {
       commit('updateMarker', marker)
     },
+    SET_MARKER_ACTIVE ({commit}, id = null) {
+      commit('setMarkerActive', id)
+    },
     async REMOVE_MARKER ({commit}, id) {
       await backendApiService.removeMarker(id)
       commit('removeMarker', id)
     },
     SET_LOCALE (_, locale) {
       backendApiService.setLocale(locale)
+    },
+    TOGGLE_INFO ({commit}, value) {
+      backendApiService.toggleInfo(value)
+      commit('toggleInfo', value)
     }
   },
   mutations: {
@@ -54,11 +65,17 @@ export default {
         state.markers.splice(index, 1, marker)
       }
     },
+    setMarkerActive (state, id) {
+      state.activeMarker = id
+    },
     removeMarker (state, id) {
       const index = state.markers.findIndex(item => item.id === id)
       if (index > -1) {
         state.markers.splice(index, 1)
       }
+    },
+    toggleInfo (state, value) {
+      state.isInfoVisible = value
     }
   }
 }
