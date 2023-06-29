@@ -11,6 +11,7 @@
       class="pa-1"
       :class="{'justify-center': xs && rail}"
       :ripple="false"
+      id="sidebar-item"
       variant="plain"
       @click.stop="rail = !rail"
     >
@@ -35,7 +36,7 @@
       :items="markersList"
       class="overflow-x-hidden"
       :class="{'sidebar__markers': rail}"
-      :height="xs ? '55%' : '85%'"
+      :height="scrollerHeight"
     >
       <template #default="{ item }">
         <v-list-item
@@ -72,7 +73,7 @@
       </template>
     </v-virtual-scroll>
     <v-divider></v-divider>
-    <v-list-item class="pa-1" variant="plain">
+    <v-list-item class="pa-1" id="sidebar-item" variant="plain">
       <template #title>
         <span class="d-block text-center">{{ t('map_page.info_panel') }}</span>
       </template>
@@ -106,6 +107,7 @@ const emit = defineEmits(['goToMarker'])
 
 const markersList = computed(() => getMarkersList())
 const activeMarker = computed(() => store.getters.getActiveMarker)
+const scrollerHeight = ref('0')
 const infoPanel = ref(true)
 const drawer = ref(true)
 const rail = ref(true)
@@ -118,7 +120,14 @@ watch(infoPanel, (newVal, oldVal) => {
 
 onMounted(() => {
   infoPanel.value = JSON.parse(localStorage.getItem('info_panel')) ?? true
+  scrollerHeight.value = calcScrollerHeight()
 })
+
+function calcScrollerHeight () {
+  const items = document.querySelectorAll('#sidebar-item')
+  const itemsHeight = Array.from(items).reduce((sum, item) => sum + Math.round(item?.getBoundingClientRect()?.height || 0), 2)
+  return `calc(100% - ${itemsHeight}px)`
+}
 
 function getMarkersList () {
   const markers = store.getters.getMarkers
